@@ -1,0 +1,62 @@
+<html>
+<head>
+<script>
+  function refreshByte(i) {
+    var col = i % 128, row = i >> 7, summ = 0;
+    for (var j = 0; j < 8; j++) {
+      summ += document.getElementById(col + (row*8+j)*128).className === 'false' ? 0 : 1 << j;
+    }
+    return '0x'+ (summ < 16 ? '0' : '') + summ.toString(16);
+  }
+  function refreshData() {
+    var result = 'const unsigned char pic[] = {';
+    for(var i = 0; i < 128*32/8; i++) {
+      if (i % 16 === 0) {
+        result += '\n';
+      }
+      result += refreshByte(i) + ',';
+    }
+    code.value = result + '\n};';
+  }
+  function flop(element) {
+    if (element.className === 'true') {
+      element.className = 'false';
+    } else {
+      element.className = 'true';
+    }
+    refreshData();
+  }
+</script>
+<style>
+div.row div {
+  width:5px;
+  height:5px;
+  display: inline-block;
+}
+div.true {
+  background-color:white;
+}
+div.false {
+  background-color:black;
+}
+</style>
+</head>
+<body>
+<div id="all">
+</div>
+<br/>
+<textarea id="code" style="width:100%;height:50%"></textarea>
+<script>
+  var all = [];
+  for (var j = 0; j < 32; j++) {
+    all.push('<div class="row">');
+    for(var i = 0; i < 128; i++) {
+      all.push('<div id="'+ (j*128 + i) +'" class="false" onclick="flop(this);"></div>');
+    }
+    all.push('</div>');
+  }
+  document.getElementById("all").innerHTML = all.join('');
+  refreshData();
+</script>
+</body>
+</html>
